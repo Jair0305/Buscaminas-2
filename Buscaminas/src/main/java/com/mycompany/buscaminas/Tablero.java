@@ -13,7 +13,7 @@ Casilla[][] casillas;
     int numMinas;
     
     int numCasillasAbiertas;
-	boolean juegoTerminado;
+    boolean juegoTerminado;
     
     private Consumer<List<Casilla>> eventoPartidaPerdida;
     public Consumer<List<Casilla>> eventoPartidaGanada;

@@ -67,14 +67,16 @@ public class FrmJuego extends javax.swing.JFrame {
     	tablero = new Tablero(numFilas, numColumnas, numMinas);
     	tablero.setEventoPartidaPerdida(new Consumer<List<Casilla>>() {
 			
-			@Override
-			public void accept(List<Casilla> t) {
-				for(Casilla casillasConMina: t)
-				{
-					botonesTablero[casillasConMina.getPosFila()][casillasConMina.getPosColumna()].setText("*");
-				}
-			}
-		});
+                @Override
+                public void accept(List<Casilla> t) 
+                {
+                    for(Casilla casillasConMina: t)
+                    {
+                            botonesTablero[casillasConMina.getPosFila()][casillasConMina.getPosColumna()].setText("*");
+                    }
+                    deshabilitarBotones();
+                }   
+        });
     	tablero.setEventoPartidaGanada(new Consumer<List<Casilla>>() {
 		
     		@Override
@@ -84,6 +86,7 @@ public class FrmJuego extends javax.swing.JFrame {
     			{
     				botonesTablero[casillaConMina.getPosFila()][casillaConMina.getPosColumna()].setText(":)");
     			}
+                        deshabilitarBotones();
     		}
     	});
     	
@@ -97,6 +100,15 @@ public class FrmJuego extends javax.swing.JFrame {
     		}
     	});
     }
+    
+    private void deshabilitarBotones() {
+        for(int i = 0; i < botonesTablero.length; i++) {
+            for(int j = 0; j < botonesTablero[i].length; j++) {
+                botonesTablero[i][j].setEnabled(false);
+            }
+        }
+    }
+
     
     private void cargarControles()
     {
@@ -246,6 +258,7 @@ public class FrmJuego extends javax.swing.JFrame {
         
         this.numColumnas = num;
         this.numFilas = num;
+        this.numMinas = num;
         juegoNuevo();
     }//GEN-LAST:event_tamanoActionPerformed
 
