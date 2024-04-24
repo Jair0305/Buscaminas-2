@@ -1,4 +1,6 @@
-package buscaminas;
+package com.mycompany.buscaminas;
+
+import buscaminas.Casilla;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.function.Consumer;
 
 public class Tablero {
 	
-Casilla[][] casillas;
+buscaminas.Casilla[][] casillas;
     
     int numFilas;
     int numColumnas;
@@ -38,26 +40,29 @@ Casilla[][] casillas;
                 casillas[i][j] = new Casilla(i,j);
             }
         }
-        
-        generacionDeMinas();
+
     }
-    
-    private void generacionDeMinas()
+
+    private void generacionDeMinas(int primeraFila, int primeraColumna)
     {
         int minasGeneradas = 0;
-        
-        while(minasGeneradas!=numMinas)
+
+        while(minasGeneradas != numMinas)
         {
             int posFila =(int)(Math.random()*casillas.length);
             int posColumna =(int)(Math.random()*casillas[0].length);
-            
-            if(!casillas[posFila][posColumna].isMina())
+
+            if(!casillas[posFila][posColumna].isMina() && !estaAlrededor(primeraFila, primeraColumna, posFila, posColumna))
             {
                 casillas[posFila][posColumna].setMina(true);
                 minasGeneradas++;
             }
         }
         actualizarNumeroMinasAlrededor();
+    }
+
+    private boolean estaAlrededor(int filaCentral, int columnaCentral, int fila, int columna) {
+        return Math.abs(filaCentral - fila) <= 1 && Math.abs(columnaCentral - columna) <= 1;
     }
     
     public void mostrarTablero()
@@ -165,6 +170,11 @@ Casilla[][] casillas;
     
     public void seleccionarCasilla(int posFila, int posColumna)
     {
+        if(numCasillasAbiertas == 0)
+        {
+            generacionDeMinas(posFila, posColumna);
+        }
+
     	eventoCasillaAbierta.accept(this.casillas[posFila][posColumna]);
     	if(this.casillas[posFila][posColumna].isMina())
     	{

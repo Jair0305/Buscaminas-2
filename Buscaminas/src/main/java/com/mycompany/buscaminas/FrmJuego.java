@@ -5,7 +5,6 @@
 package com.mycompany.buscaminas;
 
 import buscaminas.Casilla;
-import buscaminas.Tablero;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -26,6 +25,7 @@ public class FrmJuego extends javax.swing.JFrame {
 	int numColumnas = 25;
 	int numMinas = 5;
 	JButton[][] botonesTablero;
+    Temporizador temporizador;
 	
 	Tablero tablero;
 	
@@ -34,6 +34,7 @@ public class FrmJuego extends javax.swing.JFrame {
      */
     public FrmJuego() {
         initComponents();
+        temporizador = new Temporizador();
         juegoNuevo();
     }
     
@@ -158,6 +159,7 @@ public class FrmJuego extends javax.swing.JFrame {
     	int posFila=Integer.parseInt(coordenada[0]);
     	int posColumna=Integer.parseInt(coordenada[1]);
     	tablero.seleccionarCasilla(posFila, posColumna);
+        temporizador.actualizarInterfazGrafica();
     }
 
     /**

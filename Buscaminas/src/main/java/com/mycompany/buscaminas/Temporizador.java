@@ -30,22 +30,28 @@ public class Temporizador {
                 actualizarInterfazGrafica();
                 
             }
-           
-            
-            
         });
         
         timer.start();
     }
     
-    private void actualizarInterfazGrafica()
+    public void actualizarInterfazGrafica()
     {
-        System.out.println("Tiempo actual: " + tiempo);
+        double segundos = tiempo/100.0;
+        System.out.println("Tiempo actual: " + String.format("%.2f", segundos) + " segundos");
     }
     
     public static void main(String[] args)
     {
         new Temporizador();
+        try
+        {
+            Thread.sleep(10000);
+        }
+        catch(InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
     
 }
