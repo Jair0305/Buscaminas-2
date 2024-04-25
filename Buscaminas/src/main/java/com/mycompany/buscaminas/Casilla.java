@@ -7,6 +7,7 @@ public class Casilla {
     boolean mina;
     int minasAlrededor;
     boolean Abierta;
+    boolean bandera;
 
     public Casilla(int posFila, int posColumna) {
         this.posFila = posFila;
@@ -69,4 +70,18 @@ public class Casilla {
 	public void setAbierta(boolean abierta) {
 		Abierta = abierta;
 	}
+
+    public boolean isBandera() {
+        return bandera;
+    }
+
+    public void setBandera(boolean bandera) {
+        this.bandera = bandera;
+    }
+
+    public void cambiarBandera() {
+        this.bandera = !this.bandera;
+    }
+
+
 }

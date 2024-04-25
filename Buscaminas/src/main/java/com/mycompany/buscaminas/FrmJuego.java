@@ -6,6 +6,8 @@ package com.mycompany.buscaminas;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -148,13 +150,23 @@ public class FrmJuego extends javax.swing.JFrame {
                 {
                     botonesTablero[i][j].setBounds(botonesTablero[i-1][j].getX(),botonesTablero[i-1][j].getY() + botonesTablero[i-1][j].getHeight(),anchoControl,altoControl);
                 }
-                botonesTablero[i][j].addActionListener(new ActionListener() {
 
+                botonesTablero[i][j].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnClick(e);
                     }
                 });
+
+                botonesTablero[i][j].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            btnClickDerecho(e);
+                        }
+                    }
+                });
+
                 getContentPane().add(botonesTablero[i][j]);
             }
         }
@@ -168,27 +180,74 @@ public class FrmJuego extends javax.swing.JFrame {
 
     private void btnClick(ActionEvent e)
     {
-        if(!primerClick)
-        {
+        JButton btn = (JButton)e.getSource();
+        String[] coordenada = btn.getName().split(",");
+        int posFila=Integer.parseInt(coordenada[0]);
+        int posColumna=Integer.parseInt(coordenada[1]);
+        if(tablero.casillas[posFila][posColumna].isBandera()) {
+            return;
+        }
+        if (!primerClick) {
             temporizador.start();
             primerClick = true;
-            numeroDeClicks ++;
+            numeroDeClicks++;
         }
-    	JButton btn = (JButton)e.getSource();
-    	String[] coordenada = btn.getName().split(",");
-    	int posFila=Integer.parseInt(coordenada[0]);
-    	int posColumna=Integer.parseInt(coordenada[1]);
-    	tablero.seleccionarCasilla(posFila, posColumna);
+        tablero.seleccionarCasilla(posFila, posColumna);
         numeroDeClicks ++;
     }
 
-    private void btnClickDerecho(ActionEvent e)
+    private void btnClickDerecho(MouseEvent e)
     {
-    	JButton btn = (JButton)e.getSource();
-    	String[] coordenada = btn.getName().split(",");
-    	int posFila=Integer.parseInt(coordenada[0]);
-    	int posColumna=Integer.parseInt(coordenada[1]);
-    	tablero.marcarCasilla(posFila, posColumna);
+        if (SwingUtilities.isRightMouseButton(e)) {
+            JButton btn = (JButton)e.getSource();
+            String[] coordenada = btn.getName().split(",");
+            int posFila=Integer.parseInt(coordenada[0]);
+            int posColumna=Integer.parseInt(coordenada[1]);
+            if(tablero.casillas[posFila][posColumna].isBandera())
+            {
+                tablero.casillas[posFila][posColumna].setBandera(false);
+                btn.setText("");
+                numeroDeClicks++;
+            }else{
+                tablero.casillas[posFila][posColumna].setBandera(true);
+                btn.setText("F");
+                numeroDeClicks++;
+            }
+        }
+    }
+
+    public void mostrarPuntuaciones(String dificultad) {
+        JDialog dialog = new JDialog(this, "Puntuaciones - " + dificultad, true);
+
+        GameDAO gameDAO = new GameDAO();
+        List<Puntuacion> puntuacionesList = gameDAO.obtenerPuntuacionesPorDificultad(dificultad);
+
+        if (puntuacionesList.size() > 10) {
+            puntuacionesList = puntuacionesList.subList(0, 10);
+        }
+
+        Object[][] puntuaciones = new Object[puntuacionesList.size()][6];
+        for (int i = 0; i < puntuacionesList.size(); i++) {
+            Puntuacion puntuacion = puntuacionesList.get(i);
+            puntuaciones[i][0] = puntuacion.getNombre();
+            puntuaciones[i][1] = puntuacion.getClicks();
+            puntuaciones[i][2] = puntuacion.getTiempo();
+            puntuaciones[i][3] = puntuacion.getDificultad();
+            puntuaciones[i][4] = puntuacion.getFecha();
+            puntuaciones[i][5] = puntuacion.getHora();
+        }
+
+        String[] columnNames = {"Nombre", "Clicks", "Tiempo", "Dificultad", "Fecha", "Hora"};
+
+        JTable table = new JTable(puntuaciones, columnNames);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        dialog.add(scrollPane);
+
+        dialog.setSize(600, 300);
+
+        dialog.setVisible(true);
     }
 
     /**
@@ -208,10 +267,54 @@ public class FrmJuego extends javax.swing.JFrame {
         tamano = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         juegoNuevo = new javax.swing.JMenuItem();
+        menuPuntuaciones = new javax.swing.JMenu();
+        puntuacionesFacil = new javax.swing.JMenuItem();
+        puntuacionesMedio = new javax.swing.JMenuItem();
+        puntuacionesDificil = new javax.swing.JMenuItem();
+        puntuacionesPersonalizado = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+
+
         menuDificultad.setText("Dificultad");
+        menuPuntuaciones.setText("Puntuaciones");
+
+        puntuacionesDificil.setText("Dificil");
+
+        puntuacionesMedio.setText("Medio");
+
+        puntuacionesFacil.setText("Facil");
+
+        puntuacionesPersonalizado.setText("Personalizado");
+
+        puntuacionesFacil.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarPuntuaciones("Facil");
+            }
+        });
+
+        puntuacionesMedio.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarPuntuaciones("Medio");
+            }
+        });
+
+        puntuacionesDificil.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarPuntuaciones("Dificil");
+            }
+        });
+
+        puntuacionesPersonalizado.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarPuntuaciones("Personalizado");
+            }
+        });
 
         facil.setText("Facil");
         facil.addActionListener(new java.awt.event.ActionListener() {
@@ -243,9 +346,17 @@ public class FrmJuego extends javax.swing.JFrame {
                 tamanoActionPerformed(evt);
             }
         });
+
+        menuPuntuaciones.add(puntuacionesFacil);
+        menuPuntuaciones.add(puntuacionesMedio);
+        menuPuntuaciones.add(puntuacionesDificil);
+        menuPuntuaciones.add(puntuacionesPersonalizado);
+
+
         menuDificultad.add(tamano);
 
         jMenuBar1.add(menuDificultad);
+        jMenuBar1.add(menuPuntuaciones);
 
         jMenu1.setText("Juego");
 
@@ -275,6 +386,8 @@ public class FrmJuego extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
+
     private void facilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facilActionPerformed
         // TODO add your handling code here:
         this.numColumnas = 10;
@@ -291,7 +404,7 @@ public class FrmJuego extends javax.swing.JFrame {
         this.numColumnas = num;
         this.numFilas = num;
         this.numMinas = num;
-        this.dificultad = "Personalizado";
+        this.dificultad = "Personalizado: FCM("+numFilas+","+numColumnas+","+numMinas+")";
         juegoNuevo();
     }//GEN-LAST:event_tamanoActionPerformed
 
@@ -358,6 +471,11 @@ public class FrmJuego extends javax.swing.JFrame {
     private javax.swing.JMenuItem juegoNuevo;
     private javax.swing.JMenuItem medio;
     private javax.swing.JMenu menuDificultad;
+    private javax.swing.JMenu menuPuntuaciones;
+    private javax.swing.JMenuItem puntuacionesFacil;
+    private javax.swing.JMenuItem puntuacionesMedio;
+    private javax.swing.JMenuItem puntuacionesPersonalizado;
+    private javax.swing.JMenuItem puntuacionesDificil;
     private javax.swing.JMenuItem tamano;
     // End of variables declaration//GEN-END:variables
 }

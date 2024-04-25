@@ -169,6 +169,10 @@ public class Tablero {
     
     public void seleccionarCasilla(int posFila, int posColumna)
     {
+        if(this.casillas[posFila][posColumna].isBandera()) {
+            return;
+        }
+
         if(numCasillasAbiertas == 0)
         {
             generacionDeMinas(posFila, posColumna);
@@ -248,6 +252,10 @@ public class Tablero {
 
 
     public void marcarCasilla(int posFila, int posColumna) {
+        this.casillas[posFila][posColumna].setBandera(true);
+    }
 
+    public void desmarcarCasilla(int posFila, int posColumna) {
+        this.casillas[posFila][posColumna].setBandera(false);
     }
 }

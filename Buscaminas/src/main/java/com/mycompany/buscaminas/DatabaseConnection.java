@@ -1,9 +1,8 @@
 package com.mycompany.buscaminas;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseConnection {
 
@@ -22,16 +21,19 @@ public class DatabaseConnection {
 
     private static void createTablesIfNotExist(Connection connection) {
         try (Statement stmt = connection.createStatement()) {
-            String sql = "CREATE TABLE IF NOT EXISTS Partida (\n"
-                    + " id integer PRIMARY KEY,\n"
-                    + " name text NOT NULL,\n"
-                    + " clicks integer NOT NULL,\n"
-                    + " tiempo integer NOT NULL,\n"
-                    + " dificultad text NOT NULL\n"
+            String sql = "CREATE TABLE IF NOT EXISTS Puntuaciones (\n"
+                    + " id INTEGER PRIMARY KEY,\n"
+                    + " nombre TEXT NOT NULL,\n"
+                    + " clicks INTEGER NOT NULL,\n"
+                    + " tiempo REAL NOT NULL,\n"
+                    + " dificultad TEXT NOT NULL,\n"
+                    + " fecha DATE NOT NULL,\n"
+                    + " hora TIME NOT NULL\n"
                     + ");";
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
+
 }
