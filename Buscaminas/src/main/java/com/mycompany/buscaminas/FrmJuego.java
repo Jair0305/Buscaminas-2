@@ -4,16 +4,12 @@
  */
 package com.mycompany.buscaminas;
 
-import buscaminas.Casilla;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.*;
 
 /**
  *
@@ -21,20 +17,26 @@ import javax.swing.JRadioButtonMenuItem;
  */
 public class FrmJuego extends javax.swing.JFrame {
 
-    int numFilas = 25;
-	int numColumnas = 25;
-	int numMinas = 5;
+    int numFilas = 10;
+	int numColumnas = 8;
+	int numMinas = 10;
+
 	JButton[][] botonesTablero;
-    Temporizador temporizador;
-	
+    JLabel labelTiempo = new JLabel("0");
+    Temporizador temporizador = new Temporizador(labelTiempo);
+    boolean primerClick = false;
+	int numeroDeClicks = 0;
 	Tablero tablero;
+    String dificultad = "Facil";
 	
     /**
      * Creates new form FrmJuego
      */
+
+
+
     public FrmJuego() {
         initComponents();
-        temporizador = new Temporizador();
         juegoNuevo();
     }
     
@@ -61,6 +63,11 @@ public class FrmJuego extends javax.swing.JFrame {
         cargarControles();
         crearTablero();
         repaint();
+        primerClick = false;
+        temporizador.stop();
+        temporizador.reset();
+        labelTiempo.setText("0");
+        numeroDeClicks = 0;
     }
     
     private void crearTablero()
@@ -76,6 +83,8 @@ public class FrmJuego extends javax.swing.JFrame {
                             botonesTablero[casillasConMina.getPosFila()][casillasConMina.getPosColumna()].setText("*");
                     }
                     deshabilitarBotones();
+                    temporizador.stop();
+                    JOptionPane.showMessageDialog(null, "Perdiste");
                 }   
         });
     	tablero.setEventoPartidaGanada(new Consumer<List<Casilla>>() {
@@ -88,6 +97,10 @@ public class FrmJuego extends javax.swing.JFrame {
     				botonesTablero[casillaConMina.getPosFila()][casillaConMina.getPosColumna()].setText(":)");
     			}
                         deshabilitarBotones();
+                        temporizador.stop();
+                        String nombreJugador = JOptionPane.showInputDialog("Ganaste con un tiempo de: " + labelTiempo.getText() + " segundos con " + numeroDeClicks + " clicks.\n Ingresa tu nombre:");
+                        GameDAO gameDAO = new GameDAO();
+                        gameDAO.savePartida(Objects.requireNonNullElse(nombreJugador, "Jugador"), numeroDeClicks, Float.parseFloat(labelTiempo.getText()), dificultad);
     		}
     	});
     	
@@ -110,56 +123,72 @@ public class FrmJuego extends javax.swing.JFrame {
         }
     }
 
-    
     private void cargarControles()
     {
-    	int posXReferencia = 25;
-    	int posYReferencia=25;
-    	int anchoControl=30;
-    	int altoControl=30;
-    	
-    	botonesTablero = new JButton[numFilas][numColumnas];
-    	for(int i = 0; i < botonesTablero.length; i++)
-    	{
-    		for(int j = 0; j<botonesTablero[i].length;j++)
-    		{
-    			botonesTablero[i][j] = new JButton();
-    			botonesTablero[i][j].setName(i+","+j);
-    			botonesTablero[i][j].setBorder(null);
-    			if(i==0 && j==0)
-    			{
-    				botonesTablero[i][j].setBounds(posXReferencia,posYReferencia,anchoControl,altoControl);
- 
-    			}else if( i==0 && j!=0)
-    			{
-    				botonesTablero[i][j].setBounds(botonesTablero[i][j-1].getX()+botonesTablero[i][j-1].getWidth(),posYReferencia,anchoControl,altoControl);
-    			}else
-    			{
-    				botonesTablero[i][j].setBounds(botonesTablero[i-1][j].getX(),botonesTablero[i-1][j].getY() + botonesTablero[i-1][j].getHeight(),anchoControl,altoControl);
-    			}
-    			botonesTablero[i][j].addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						btnClick(e);
-						
-					}
-				});
-    			getContentPane().add(botonesTablero[i][j]);
-    		}
-    	} 
+        int posXReferencia = 25;
+        int posYReferencia=25;
+        int anchoControl=30;
+        int altoControl=30;
+
+        botonesTablero = new JButton[numFilas][numColumnas];
+        for(int i = 0; i < botonesTablero.length; i++)
+        {
+            for(int j = 0; j<botonesTablero[i].length;j++)
+            {
+                botonesTablero[i][j] = new JButton();
+                botonesTablero[i][j].setName(i+","+j);
+                botonesTablero[i][j].setBorder(null);
+                if(i==0 && j==0)
+                {
+                    botonesTablero[i][j].setBounds(posXReferencia,posYReferencia,anchoControl,altoControl);
+                }else if( i==0 && j!=0)
+                {
+                    botonesTablero[i][j].setBounds(botonesTablero[i][j-1].getX()+botonesTablero[i][j-1].getWidth(),posYReferencia,anchoControl,altoControl);
+                }else
+                {
+                    botonesTablero[i][j].setBounds(botonesTablero[i-1][j].getX(),botonesTablero[i-1][j].getY() + botonesTablero[i-1][j].getHeight(),anchoControl,altoControl);
+                }
+                botonesTablero[i][j].addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnClick(e);
+                    }
+                });
+                getContentPane().add(botonesTablero[i][j]);
+            }
+        }
         this.setSize(botonesTablero[numFilas-1][numColumnas-1].getX() + botonesTablero[numFilas-1][numColumnas-1].getWidth()+40,
                 botonesTablero[numFilas-1][numColumnas-1].getY() + botonesTablero[numFilas-1][numColumnas-1].getHeight() + 90);
+
+        // Agrega el JLabel para el tiempo
+        labelTiempo.setBounds(50, 1, 100, 30); // Ajusta los valores según tus necesidades
+        getContentPane().add(labelTiempo);
     }
-    
+
     private void btnClick(ActionEvent e)
     {
+        if(!primerClick)
+        {
+            temporizador.start();
+            primerClick = true;
+            numeroDeClicks ++;
+        }
     	JButton btn = (JButton)e.getSource();
     	String[] coordenada = btn.getName().split(",");
     	int posFila=Integer.parseInt(coordenada[0]);
     	int posColumna=Integer.parseInt(coordenada[1]);
     	tablero.seleccionarCasilla(posFila, posColumna);
-        temporizador.actualizarInterfazGrafica();
+        numeroDeClicks ++;
+    }
+
+    private void btnClickDerecho(ActionEvent e)
+    {
+    	JButton btn = (JButton)e.getSource();
+    	String[] coordenada = btn.getName().split(",");
+    	int posFila=Integer.parseInt(coordenada[0]);
+    	int posColumna=Integer.parseInt(coordenada[1]);
+    	tablero.marcarCasilla(posFila, posColumna);
     }
 
     /**
@@ -251,6 +280,7 @@ public class FrmJuego extends javax.swing.JFrame {
         this.numColumnas = 10;
         this.numFilas = 8;
         this.numMinas = 10;
+        this.dificultad = "Facil";
         juegoNuevo();
     }//GEN-LAST:event_facilActionPerformed
 
@@ -261,6 +291,7 @@ public class FrmJuego extends javax.swing.JFrame {
         this.numColumnas = num;
         this.numFilas = num;
         this.numMinas = num;
+        this.dificultad = "Personalizado";
         juegoNuevo();
     }//GEN-LAST:event_tamanoActionPerformed
 
@@ -272,6 +303,7 @@ public class FrmJuego extends javax.swing.JFrame {
         this.numColumnas = 15;
         this.numFilas = 18;
         this.numMinas = 40;
+        this.dificultad = "Medio";
         juegoNuevo();
     }//GEN-LAST:event_medioActionPerformed
 
@@ -279,6 +311,7 @@ public class FrmJuego extends javax.swing.JFrame {
         this.numColumnas = 24;
         this.numFilas = 20;
         this.numMinas = 99;
+        this.dificultad = "Dificil";
         juegoNuevo();
     }//GEN-LAST:event_dificilActionPerformed
 

@@ -4,54 +4,51 @@
  */
 package com.mycompany.buscaminas;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.Timer;
+import javax.swing.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
-/**
- *
- * @author jair0305
- */
 public class Temporizador {
-    
+    private ScheduledExecutorService scheduler;
+    private final AtomicLong milisegundosTranscurridos = new AtomicLong(0);
+    private final JLabel label;
 
-    private int tiempo = 0;
-    
-    public Temporizador()
-    {
-        Timer timer = new Timer(1, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tiempo++;
-                if(tiempo > 999)
+    public Temporizador(JLabel label) {
+        this.label = label;
+    }
+
+    public void start() {
+        scheduler = Executors.newScheduledThreadPool(1); // Create a new ScheduledExecutorService
+        final Runnable timer = new Runnable() {
+            public void run() {
+                long milisegundos = milisegundosTranscurridos.incrementAndGet();
+                long segundos = milisegundos / 1000;
+                long milisegundosRestantes = milisegundos % 1000;
+                label.setText(segundos + "." + milisegundosRestantes);
+                if(segundos == 999)
                 {
-                    ((Timer) e.getSource()).stop();
+                    stop();
                 }
-                actualizarInterfazGrafica();
-                
             }
-        });
-        
-        timer.start();
+        };
+        scheduler.scheduleAtFixedRate(timer, 0, 1, TimeUnit.MILLISECONDS);
     }
-    
-    public void actualizarInterfazGrafica()
-    {
-        double segundos = tiempo/100.0;
-        System.out.println("Tiempo actual: " + String.format("%.2f", segundos) + " segundos");
-    }
-    
-    public static void main(String[] args)
-    {
-        new Temporizador();
-        try
-        {
-            Thread.sleep(10000);
-        }
-        catch(InterruptedException e)
-        {
-            e.printStackTrace();
+
+    public void stop(){
+        if(scheduler != null){
+            scheduler.shutdownNow();
         }
     }
-    
+
+    public void reset(){
+        milisegundosTranscurridos.set(0);
+    }
+
+
+    public void resetWithoutStart(){
+        milisegundosTranscurridos.set(0);
+
+    }
 }

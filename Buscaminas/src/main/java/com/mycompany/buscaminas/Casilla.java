@@ -1,4 +1,4 @@
-package buscaminas;
+package com.mycompany.buscaminas;
 
 public class Casilla {
 	

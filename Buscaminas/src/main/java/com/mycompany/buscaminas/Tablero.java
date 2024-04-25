@@ -1,6 +1,5 @@
 package com.mycompany.buscaminas;
 
-import buscaminas.Casilla;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.function.Consumer;
 
 public class Tablero {
 	
-buscaminas.Casilla[][] casillas;
+    Casilla[][] casillas;
     
     int numFilas;
     int numColumnas;
@@ -246,8 +245,9 @@ buscaminas.Casilla[][] casillas;
 	public void setEventoPartidaGanada(Consumer<List<Casilla>> eventoPartidaGanada) {
 		this.eventoPartidaGanada = eventoPartidaGanada;
 	}
-	
-	
-    
-    
+
+
+    public void marcarCasilla(int posFila, int posColumna) {
+
+    }
 }
