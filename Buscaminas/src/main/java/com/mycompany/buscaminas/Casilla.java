@@ -1,20 +1,19 @@
 package com.mycompany.buscaminas;
 
 public class Casilla {
-	
-	int posFila;
+
+    int posFila;
     int posColumna;
     boolean mina;
     int minasAlrededor;
     boolean Abierta;
     boolean bandera;
+    boolean interrogacion;
 
     public Casilla(int posFila, int posColumna) {
         this.posFila = posFila;
         this.posColumna = posColumna;
     }
-    
-    
 
     public int getPosFila() {
         return posFila;
@@ -39,37 +38,26 @@ public class Casilla {
     public void setMina(boolean mina) {
         this.mina = mina;
     }
-    
-    
-    
+
     public int getMinasAlrededor() {
-		return minasAlrededor;
-	}
-
-
-
-	public void setMinasAlrededor(int minasAlrededor) {
-		this.minasAlrededor = minasAlrededor;
-	}
-
-
-
-	public void inrementarNumeroMinasAlrededor()
-    {
-    	this.minasAlrededor++;
+        return minasAlrededor;
     }
 
+    public void setMinasAlrededor(int minasAlrededor) {
+        this.minasAlrededor = minasAlrededor;
+    }
 
+    public void incrementarNumeroMinasAlrededor() {
+        this.minasAlrededor++;
+    }
 
-	public boolean isAbierta() {
-		return Abierta;
-	}
+    public boolean isAbierta() {
+        return Abierta;
+    }
 
-
-
-	public void setAbierta(boolean abierta) {
-		Abierta = abierta;
-	}
+    public void setAbierta(boolean abierta) {
+        Abierta = abierta;
+    }
 
     public boolean isBandera() {
         return bandera;
@@ -83,5 +71,12 @@ public class Casilla {
         this.bandera = !this.bandera;
     }
 
+    public boolean isInterrogacion() {
+        return interrogacion;
+    }
+
+    public void setInterrogacion(boolean interrogacion) {
+        this.interrogacion = interrogacion;
+    }
 
 }

@@ -5,50 +5,52 @@
 package com.mycompany.buscaminas;
 
 import javax.swing.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Temporizador {
-    private ScheduledExecutorService scheduler;
-    private final AtomicLong milisegundosTranscurridos = new AtomicLong(0);
+    private Timer timer;
+    private int secondsElapsed;
     private final JLabel label;
 
     public Temporizador(JLabel label) {
         this.label = label;
+        this.secondsElapsed = 0;
+
+        timer = new Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                secondsElapsed++;
+                updateLabel();
+            }
+        });
     }
 
     public void start() {
-        scheduler = Executors.newScheduledThreadPool(1); // Create a new ScheduledExecutorService
-        final Runnable timer = new Runnable() {
-            public void run() {
-                long milisegundos = milisegundosTranscurridos.incrementAndGet();
-                long segundos = milisegundos / 1000;
-                long milisegundosRestantes = milisegundos % 1000;
-                label.setText(segundos + "." + milisegundosRestantes);
-                if(segundos == 999)
-                {
-                    stop();
-                }
-            }
-        };
-        scheduler.scheduleAtFixedRate(timer, 0, 1, TimeUnit.MILLISECONDS);
-    }
-
-    public void stop(){
-        if(scheduler != null){
-            scheduler.shutdownNow();
+        if (!timer.isRunning()) {
+            timer.start();
         }
     }
 
-    public void reset(){
-        milisegundosTranscurridos.set(0);
+    public void stop() {
+        timer.stop();
     }
 
+    public void reset() {
+        timer.stop();
+        secondsElapsed = 0;
+        updateLabel();
+    }
 
-    public void resetWithoutStart(){
-        milisegundosTranscurridos.set(0);
+    public void resetWithoutStart() {
+        reset();
+    }
 
+    private void updateLabel() {
+        long minutes = secondsElapsed / 60;
+        long seconds = secondsElapsed % 60;
+        label.setText(String.format("%02d:%02d", minutes, seconds));
+    }
+
+    public int getSeconds() {
+        return secondsElapsed;
     }
 }
