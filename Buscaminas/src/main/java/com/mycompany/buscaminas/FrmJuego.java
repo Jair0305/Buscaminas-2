@@ -55,6 +55,19 @@ public class FrmJuego extends javax.swing.JFrame {
         setTitle("Buscaminas Pro");
         // setSize(800, 600); // Removed fixed size to allow pack() to work
         setLocationRelativeTo(null);
+
+        // Set Application Icon
+        try {
+            java.net.URL iconURL = getClass().getResource("/icon.png");
+            if (iconURL != null) {
+                setIconImage(new ImageIcon(iconURL).getImage());
+                // Also set taskbar icon for some OSs if supported, but setIconImage usually
+                // covers it on Windows/Linux
+            }
+        } catch (Exception e) {
+            System.out.println("Icon not found");
+        }
+
         setLayout(new BorderLayout());
 
         // Initialize components
